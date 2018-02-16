@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFreeSpotTable extends Migration
+class CreateFreeSpotsClaimsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateFreeSpotTable extends Migration
      */
     public function up()
     {
-        Schema::create('free_spots', function (Blueprint $table) {
+        Schema::create('free_spots_claims', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->integer('spot_id');
-            $table->date('date_from');
-            $table->date('date_to');
+            $table->integer('free_spot_id');
+            $table->string('claimer_user');
+            $table->date('date_claimed');
         });
     }
 
@@ -29,6 +29,6 @@ class CreateFreeSpotTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('free_spots');
+        Schema::dropIfExists('free_spots_claims');
     }
 }

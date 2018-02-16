@@ -16,4 +16,12 @@ class Spot extends Model
         'description',
         'owner_user',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function freeSpots()
+    {
+        return $this->hasMany(FreeSpot::class);
+    }
 }
