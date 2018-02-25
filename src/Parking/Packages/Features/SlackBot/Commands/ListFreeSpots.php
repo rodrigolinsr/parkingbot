@@ -119,10 +119,10 @@ class ListFreeSpots extends BaseCommand
                                                      ->where('date_claimed', $from)
                                                      ->first();
                         if ($claim) {
-                            $message .= "- <@{$this->getUserIdFromUserName($spot->owner_user)}> - claimed by " .
-                                "<@{$this->getUserIdFromUserName($claim->claimer_user)}>\n";
+                            $message .= "- {$spot->owner_user} - claimed by " .
+                                "{$claim->claimer_user}\n";
                         } else {
-                            $message .= "- <@{$this->getUserIdFromUserName($spot->owner_user)}> - not free\n";
+                            $message .= "- {$this->getUserIdFromUserName($spot->owner_user)} - not free\n";
                         }
                     }
                 }

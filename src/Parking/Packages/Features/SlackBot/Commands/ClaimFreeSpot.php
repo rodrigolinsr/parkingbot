@@ -21,7 +21,6 @@ class ClaimFreeSpot extends BaseCommand
     {
         $userId   = $this->getCurrentUser();
         $username = $this->getUserNameFromUserId($userId);
-        $userImId = $this->getImIdFromUserId($userId);
 
         /** @var Spot $spot */
         $spot = null;
@@ -49,7 +48,7 @@ class ClaimFreeSpot extends BaseCommand
                 }
 
                 if ($spot->owner_user === $username) {
-                    $this->send($userImId, null,
+                    $this->send($this->getCurrentChannel(), null,
                         "You're the owner of this spot already! :smile:");
 
                     return;
@@ -108,10 +107,7 @@ class ClaimFreeSpot extends BaseCommand
 
         $ownerAndDateClaim = "claimed {$spotOwner}'s parking spot for *{$date->format('d/m/Y')}* :parking::red_car:";
         $message = "Yay! You've {$ownerAndDateClaim}!";
-        $this->send($userImId, null, $message);
 
-        $channelId = $this->getChannelIdFromChannelName(env('SLACK_NOTIFY_CHANNEL', 'general'));
-        $message = "<!here> FYI, <@{$userId}> {$ownerAndDateClaim}";
-        $this->send($channelId, null, $message);
+        $this->send($this->getCurrentChannel(), null, $message);
     }
 }

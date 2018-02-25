@@ -21,7 +21,6 @@ class NotifyFreeSpaceCommand extends BaseCommand
     {
         $userId   = $this->getCurrentUser();
         $username = $this->getUserNameFromUserId($userId);
-        $userImId = $this->getImIdFromUserId($userId);
 
         /** @var Spot $spot */
         $spot = Spot::where('owner_user', $username)->first();
@@ -98,19 +97,7 @@ class NotifyFreeSpaceCommand extends BaseCommand
             ->exists();
 
         if ($alreadyNotified) {
-            $message = "You already have notified your parking spot is free that date. Here's the list of days your spot is free:\n";
-            /** @var FreeSpot $freeSpot */
-            foreach ($spot->freeSpots()->where('date_from', '>=', Carbon::now())->get() as $freeSpot) {
-                $message .= "{$freeSpot->id}) ";
-                if ($freeSpot->date_from == $freeSpot->date_to) {
-                    $message .= "{$freeSpot->date_from}\n";
-                } else {
-                    $message .= "From {$freeSpot->date_from} to {$freeSpot->date_to}\n";
-                }
-            }
-
-            $message .= "\nUse *parkbot remove #id* to delete one of the notifications.";
-
+            $message = "You already have notified your parking spot is free that date.";
             $this->send($this->getCurrentChannel(), $this->getCurrentUser(), $message);
 
             return;
@@ -129,16 +116,5 @@ class NotifyFreeSpaceCommand extends BaseCommand
         }
 
         $this->send($this->getCurrentChannel(), $this->getCurrentUser(), $message);
-
-        $channelId = $this->getChannelIdFromChannelName(env('SLACK_NOTIFY_CHANNEL', 'general'));
-
-        $message = "<!here> FYI, <@{$userId}> parking spot will be free ";
-        if ($from->isSameDay($to)) {
-            $message .= "on {$from->format('d/m/Y')}.";
-        } else {
-            $message .= "from {$from->format('d/m/Y')} to {$to->format('d/m/Y')}.";
-        }
-
-        $this->send($channelId, null, $message);
     }
 }
