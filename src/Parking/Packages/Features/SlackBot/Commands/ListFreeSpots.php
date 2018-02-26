@@ -94,7 +94,7 @@ class ListFreeSpots extends BaseCommand
                     $spotsFree[$now->toDateString()] = [];
                     /** @var FreeSpot $row */
                     foreach ($rows as $row) {
-                        $spotsFree[$now->toDateString()][] = $row->spot->owner_user;
+                        $spotsFree[$now->toDateString()][] = $row->spot->description;
                     }
                 }
             }
@@ -119,10 +119,10 @@ class ListFreeSpots extends BaseCommand
                                                      ->where('date_claimed', $from)
                                                      ->first();
                         if ($claim) {
-                            $message .= "- {$spot->owner_user} - claimed by " .
+                            $message .= "- {$spot->description} - claimed by " .
                                 "{$claim->claimer_user}\n";
                         } else {
-                            $message .= "- {$this->getUserIdFromUserName($spot->owner_user)} - not free\n";
+                            $message .= "- {$this->getUserIdFromUserName($spot->description)} - not free\n";
                         }
                     }
                 }

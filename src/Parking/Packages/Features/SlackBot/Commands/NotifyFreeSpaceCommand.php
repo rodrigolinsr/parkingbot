@@ -2,7 +2,6 @@
 namespace Parking\Packages\Features\SlackBot\Commands;
 
 use Carbon\Carbon;
-use Parking\Models\FreeSpot;
 use Parking\Models\Spot;
 use PhpSlackBot\Command\BaseCommand;
 

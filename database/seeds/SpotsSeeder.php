@@ -17,7 +17,7 @@ class SpotsSeeder extends Seeder
             'richard' => 'Richard',
             'keziah'  => 'Keziah',
             'sarah'   => 'Sarah',
-            'hannah'  => 'Spare 1',
+            'hannah'  => 'Hannah',
         ];
 
         \Parking\Models\Spot::query()->truncate();
