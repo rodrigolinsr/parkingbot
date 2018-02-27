@@ -54,7 +54,7 @@ abstract class AbstractCommand
      */
     protected function getCommandParams(string $message): array
     {
-        $params = str_after($message, static::NAME);
+        $params = str_after(strtolower($message), static::NAME);
 
         return array_values(array_filter(explode(' ', $params)));
     }
@@ -111,5 +111,13 @@ abstract class AbstractCommand
         $message .= $this->getHelp();
 
         app(BotRunner::class)->reply($message);
+    }
+
+    /**
+     * @return BotRunner
+     */
+    protected function getBot(): BotRunner
+    {
+        return app(BotRunner::class);
     }
 }
