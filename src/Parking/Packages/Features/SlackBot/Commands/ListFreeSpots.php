@@ -1,17 +1,70 @@
 <?php
 namespace Parking\Packages\Features\SlackBot\Commands;
 
+use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use Carbon\Carbon;
+use Parking\Contracts\Features\SlackBot\BotRunner;
 use Parking\Models\FreeSpot;
 use Parking\Models\FreeSpotClaim;
 use Parking\Models\Spot;
-use PhpSlackBot\Command\BaseCommand;
 
-class ListFreeSpots extends BaseCommand
+class ListFreeSpots extends AbstractCommand
 {
-    protected function configure()
+    const NAME = 'list';
+
+    /**
+     * @param IncomingMessage|null $message
+     */
+    public function handle(?IncomingMessage $message)
     {
-        $this->setName('parkbot list');
+        $params = $this->getCommandParams($message->getText());
+
+        if (empty($params)) {
+            $dates = [
+                'from' => Carbon::now()->startOfDay(),
+                'to'   => Carbon::now()->copy()->endOfDay(),
+            ];
+        } else {
+            $dates  = $this->parseDates($params);
+        }
+
+        if ((!$dates['from'] || !$dates['to'])) {
+            $this->sendDidNotUnderstand();
+        }
+
+        /** @var Carbon $from */
+        $from = $dates['from'];
+
+        /** @var Carbon $to */
+        $to = $dates['to'];
+
+        if (($from->lt(Carbon::now()->startOfDay()) || $to->lt(Carbon::now()->startOfDay())) || $to->lt($from)) {
+            $errorMessage = "The period you've notified is invalid.";
+            $this->send($this->getCurrentChannel(), $this->getCurrentUser(), $errorMessage);
+
+            return;
+        }
+
+        dump($dates);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getHelp(): ?string
+    {
+        $helpText  = "*List free spots*\n";
+        $helpText .= $this->getUsage();
+
+        return $helpText;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUsage(): ?string
+    {
+        return "{$this->getBotUser()} list DD/MM/YYYY|from DD/MM/YYYY to DD/MM/YYYY|tomorrow|next friday|...";
     }
 
     protected function execute($message, $context)
