@@ -27,16 +27,16 @@ class CommandResolver
         $commandName = strtolower(array_get($parts, 0, null));
 
         switch ($commandName) {
-            case 'claim':
+            case ClaimFreeSpot::NAME:
                 return new ClaimFreeSpot();
 
             case ListFreeSpots::NAME:
                 return new ListFreeSpots();
 
-            case 'free':
+            case NotifyFreeSpaceCommand::NAME:
                 return new NotifyFreeSpaceCommand();
 
-            case 'help':
+            case ShowHelp::NAME:
                 return new ShowHelp();
 
             default:

@@ -44,7 +44,7 @@ class ListFreeSpots extends AbstractCommand
             return;
         }
 
-        if (($from->lt($now) || $to->lt($now)) || $to->lt($from)) {
+        if ($to->lt($from)) {
             $this->getBot()->reply("The period you've informed is invalid.");
 
             return;

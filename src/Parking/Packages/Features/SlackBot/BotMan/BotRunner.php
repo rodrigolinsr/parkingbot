@@ -75,7 +75,7 @@ class BotRunner implements Contract
         /** @var \Slack\User $slackUser */
         $slackUser = $this->users->get($userId);
 
-        return $slackUser->getUsername();
+        return $slackUser ? $slackUser->getUsername() : null;
     }
 
     /**

@@ -12,6 +12,8 @@ use Parking\Packages\Features\SlackBot\CommandResolver;
  */
 class ShowHelp extends AbstractCommand
 {
+    const NAME = 'help';
+
     /**
      * @param IncomingMessage|null $message
      */

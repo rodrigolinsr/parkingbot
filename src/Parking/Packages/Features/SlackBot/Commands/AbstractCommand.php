@@ -54,9 +54,9 @@ abstract class AbstractCommand
      */
     protected function getCommandParams(string $message): array
     {
-        $params = str_after(strtolower($message), static::NAME);
+        $paramsStart = strpos(strtolower($message), static::NAME);
 
-        return array_values(array_filter(explode(' ', $params)));
+        return array_values(array_filter(explode(' ', substr($message, $paramsStart + strlen(static::NAME)))));
     }
 
     /**
