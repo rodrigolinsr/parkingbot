@@ -58,9 +58,11 @@ class NotifyFreeSpaceCommand extends AbstractCommand
             return;
         }
 
-        $alreadyNotified = $spot->freeSpots()->whereBetween('date_from', [$from, $to])
-                                ->orWhereBetween('date_to', [$from, $to])
-                                ->exists();
+        $alreadyNotified = $spot->freeSpots()
+                                ->where(function ($query) use ($from, $to) {
+                                    $query->whereBetween('date_from', [$from, $to])
+                                          ->orWhereBetween('date_to', [$from, $to]);
+                                })->exists();
 
         if ($alreadyNotified) {
             $this->getBot()->reply("You already have notified your parking spot is free that date.");
