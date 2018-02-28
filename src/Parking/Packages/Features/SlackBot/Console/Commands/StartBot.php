@@ -2,10 +2,7 @@
 namespace Parking\Packages\Features\SlackBot\Console\Commands;
 
 use Illuminate\Console\Command;
-use Parking\Packages\Features\SlackBot\Commands\ClaimFreeSpot;
-use Parking\Packages\Features\SlackBot\Commands\ListFreeSpots;
-use Parking\Packages\Features\SlackBot\Commands\NotifyFreeSpaceCommand;
-use PhpSlackBot\Bot;
+use Parking\Contracts\Features\SlackBot\BotRunner;
 
 /**
  * Class StartBot
@@ -33,17 +30,6 @@ class StartBot extends Command
      */
     public function handle()
     {
-        $bot = new Bot();
-        $bot->setToken(env('SLACK_API_KEY'));
-        $bot->loadInternalCommands();
-        $bot->loadCommand(new NotifyFreeSpaceCommand());
-        $bot->loadCommand(new ClaimFreeSpot());
-        $bot->loadCommand(new ListFreeSpots());
-
-        try {
-            $bot->run();
-        } catch (\Exception $e) {
-            die($e);
-        }
+        app(BotRunner::class)->init()->run();
     }
 }

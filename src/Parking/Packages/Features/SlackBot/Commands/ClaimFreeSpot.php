@@ -1,101 +1,84 @@
 <?php
 namespace Parking\Packages\Features\SlackBot\Commands;
 
+use BotMan\BotMan\Messages\Incoming\IncomingMessage;
 use Carbon\Carbon;
 use Parking\Models\FreeSpot;
 use Parking\Models\Spot;
-use PhpSlackBot\Command\BaseCommand;
 
-class ClaimFreeSpot extends BaseCommand
+/**
+ * Class ClaimFreeSpot
+ *
+ * @package Parking\Packages\Features\SlackBot\Commands
+ */
+class ClaimFreeSpot extends AbstractCommand
 {
-    protected function configure()
-    {
-        $this->setName('parkbot claim');
-    }
+    const NAME = 'claim';
 
     /**
-     * @param $message
-     * @param $context
+     * @param IncomingMessage|null $message
      */
-    protected function execute($message, $context)
+    public function handle(?IncomingMessage $message)
     {
-        $userId   = $this->getCurrentUser();
-        $username = $this->getUserNameFromUserId($userId);
+        $username = $this->getBot()->getUsernameById($message->getSender());
 
         /** @var Spot $spot */
         $spot = null;
 
-        /** @var Carbon $date */
-        $date = null;
-
         $spotOwner = '';
 
-        if (isset($message['text'])) {
-            $text = str_after($message['text'], $this->getName());
-            $parts = array_values(array_filter(explode(' ', $text)));
+        $params = $this->getCommandParams($message->getText());
 
-            if (count($parts)) {
-                $targetUserId = str_replace(['<', '@', '>'], '', array_get($parts, 0));
+        if (count($params)) {
+            $targetUserId = str_replace(['<', '@', '>'], '', array_get($params, 0));
 
-                $spotOwner = $this->getUserNameFromUserId($targetUserId);
-                $spot = Spot::where('owner_user', str_replace('@', '', $spotOwner))->first();
+            $spotOwner = $this->getBot()->getUsernameById($targetUserId);
+            $spot      = Spot::where('owner_user', $spotOwner)->first();
 
-                if (!$spot) {
-                    $this->send($this->getCurrentChannel(), $this->getCurrentUser(),
-                        "Sorry, I was not able to find a parking spot for {$spotOwner}");
+            if (!$spot) {
+                $this->getBot()->reply("Sorry, I was not able to find a parking spot for ".array_get($params, 0));
 
-                    return;
-                }
+                return;
+            }
 
-                if ($spot->owner_user === $username) {
-                    $this->send($this->getCurrentChannel(), null,
-                        "You're the owner of this spot already! :smile:");
+            if ($spot->owner_user === $username) {
+                $this->getBot()->reply("You're the owner of this spot already! :smile:");
 
-                    return;
-                }
-
-                /**
-                 * parkbot claim @zainab 01/01/2018
-                 */
-                $date = null;
-                try {
-                    $date = Carbon::createFromFormat('d/m/Y', array_get($parts, 1))->startOfDay();
-                } catch (\Exception $e) {
-                }
-
-                if (!$date) {
-                    /**
-                     * Tries to detect the date from the user input.
-                     * Eg: parkbot claim @zainab next friday
-                     */
-                    try {
-                        $expression = trim(str_replace(array_get($parts, 0), '', implode(' ', $parts)));
-                        $date = (new Carbon($expression))->startOfDay();
-                    } catch (\Exception $e) {
-                    }
-                }
+                return;
             }
         }
 
-        if (!$spot || !$date) {
-            $errorMessage = "I could not understand your command. Please use " .
-                "*{$this->getName()} @spotowner DD/MM/YYYY*";
-            $this->send($this->getCurrentChannel(), $this->getCurrentUser(), $errorMessage);
+        array_shift($params);
+        $dates  = $this->parseDates($params);
+
+        /**
+         * @var Carbon $from
+         * @var Carbon $to
+         */
+        [
+            'from' => $from,
+            'to'   => $to,
+        ] = $dates;
+
+        if (!$spot || !$from || !$to || !$from->isSameDay($to)) {
+            $this->sendDidNotUnderstand();
 
             return;
         }
 
+        $date = $from->copy();
+
         /** @var FreeSpot $freeSpot */
         $freeSpot = $spot->freeSpots()->where('date_from', '<=', $date)
-            ->where('date_to', '>=', $date)
-            ->get()
-            ->filter(function ($freeSpot) use ($date) {
-                return !$freeSpot->claims()->where('date_claimed', $date)->exists();
-            })->first();
+                         ->where('date_to', '>=', $date)
+                         ->get()
+                         ->filter(function ($freeSpot) use ($date) {
+                             return !$freeSpot->claims()->where('date_claimed', $date)->exists();
+                         })->first();
 
         if (!$freeSpot) {
             $errorMessage = "Sorry, there's no free spot available for *{$date->format('d/m/Y')}*. :disappointed:";
-            $this->send($this->getCurrentChannel(), $this->getCurrentUser(), $errorMessage);
+            $this->getBot()->reply($errorMessage);
 
             return;
         }
@@ -108,6 +91,25 @@ class ClaimFreeSpot extends BaseCommand
         $ownerAndDateClaim = "claimed {$spotOwner}'s parking spot for *{$date->format('d/m/Y')}* :parking::red_car:";
         $message = "Yay! You've {$ownerAndDateClaim}!";
 
-        $this->send($this->getCurrentChannel(), null, $message);
+        $this->getBot()->reply($message);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getHelp(): ?string
+    {
+        $helpText  = "*Claim a free spot*\n";
+        $helpText .= $this->getUsage();
+
+        return $helpText;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUsage(): string
+    {
+        return "{$this->getBotUser()} claim @spotowner DD/MM/YYYY|tomorrow|next monday|...";
     }
 }
