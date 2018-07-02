@@ -12,12 +12,12 @@ class SpotsSeeder extends Seeder
     public function run()
     {
         $spots = [
-            'zainab'  => 'Zainab',
-            'doddsy'  => 'Doddsy',
-            'richard' => 'Richard',
-            'keziah'  => 'Keziah',
-            'sarah'   => 'Sarah',
-            'Dave McGregor' => 'Dave McGregor',
+            'zainab'        => 'Zainab',
+            'doddsy'        => 'Doddsy',
+            'richard'       => 'Richard',
+            'keziah'        => 'Keziah',
+            'sarah'         => 'Sarah',
+            'dave.mcgregor' => 'Dave McGregor',
         ];
 
         \Parking\Models\Spot::query()->truncate();
