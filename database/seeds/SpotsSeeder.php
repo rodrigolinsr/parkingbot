@@ -13,11 +13,11 @@ class SpotsSeeder extends Seeder
     {
         $spots = [
             'zainab'  => 'Zainab',
-            'doddsy'  => 'Dave',
+            'doddsy'  => 'Doddsy',
             'richard' => 'Richard',
             'keziah'  => 'Keziah',
             'sarah'   => 'Sarah',
-            'hannah'  => 'Hannah',
+            'Dave McGregor' => 'Dave McGregor',
         ];
 
         \Parking\Models\Spot::query()->truncate();
