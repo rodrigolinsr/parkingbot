@@ -14,7 +14,7 @@ class SpotsSeeder extends Seeder
         $spots = [
             'zainab'        => 'Zainab',
             'doddsy'        => 'Doddsy',
-            'richard'       => 'Richard',
+            'alex'          => 'Alex',
             'keziah'        => 'Keziah',
             'sarah'         => 'Sarah',
             'dave.mcgregor' => 'Dave McGregor',
