@@ -76,9 +76,9 @@ class NotifyFreeSpaceCommand extends AbstractCommand
         ]);
 
         if ($from->isSameDay($to)) {
-            $message = "Thanks, I've recorded that you're parking spot will be free on {$from->format('d/m/Y')}.";
+            $message = "Thanks, I've recorded that your parking spot will be free on {$from->format('d/m/Y')}.";
         } else {
-            $message = "Thanks, I've recorded that you're parking spot will be free " .
+            $message = "Thanks, I've recorded that your parking spot will be free " .
                 "from {$from->format('d/m/Y')} to {$to->format('d/m/Y')}.";
         }
 
