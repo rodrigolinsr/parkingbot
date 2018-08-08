@@ -14,10 +14,11 @@ class SpotsSeeder extends Seeder
         $spots = [
             'zainab'        => 'Zainab',
             'doddsy'        => 'Doddsy',
+            'richard'       => 'Richard',
             'alex'          => 'Alex',
-            'keziah'        => 'Keziah',
             'sarah'         => 'Sarah',
             'dave.mcgregor' => 'Dave McGregor',
+            'spare1'        => 'Spare 1',
         ];
 
         \Parking\Models\Spot::query()->truncate();
@@ -27,6 +28,19 @@ class SpotsSeeder extends Seeder
                 'description' => $description,
                 'owner_user'  => is_string($user) ? $user : null,
             ]);
+
+            // Spare spots are always free
+            if (starts_with($user, 'spare')) {
+                /** @var \Parking\Models\Spot $spot */
+                $spot = \Parking\Models\Spot::where('owner_user', $user)->first();
+
+                $attributes = [
+                    'date_from' => \Carbon\Carbon::create(2016, 1, 1),
+                    'date_to'   => \Carbon\Carbon::create(2100, 12, 31),
+                ];
+
+                $spot->freeSpots()->updateOrCreate($attributes, $attributes);
+            }
         }
     }
 }

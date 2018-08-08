@@ -70,8 +70,17 @@ class BotRunner implements Contract
         return $this->botMan->getDriver()->getBotUserId();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return null|string
+     */
     function getUsernameById(string $userId): ?string
     {
+        if (starts_with($userId, 'spare')) {
+            return $userId;
+        }
+
         /** @var \Slack\User $slackUser */
         $slackUser = $this->users->get($userId);
 
